@@ -22,6 +22,7 @@ function normalizeOffice(value) {
   if (normalized.startsWith('governador')) return { id: 'governador', label: 'Governador' };
   if (normalized.startsWith('senador')) return { id: 'senador', label: 'Senador' };
   if (normalized.startsWith('dep-estadual')) return { id: 'deputado-estadual', label: 'Deputado estadual' };
+  if (normalized.startsWith('dep-federal')) return { id: 'deputado-federal', label: 'Deputado federal' };
   return { id: normalized || 'outro', label: cleanText(value) || 'Outro cargo' };
 }
 

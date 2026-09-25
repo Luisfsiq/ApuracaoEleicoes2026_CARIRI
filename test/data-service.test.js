@@ -11,13 +11,20 @@ test('interpreta a estrutura eleitoral da planilha fornecida', () => {
   const data = parseElectionWorkbook(fixture);
   assert.equal(data.municipalities.length, 9);
   assert.equal(data.sections.length, 245);
-  assert.equal(data.candidates.length, 11);
+  assert.equal(data.candidates.length, 14);
   assert.deepEqual(data.offices.map((office) => office.id), [
     'presidente',
     'governador',
     'senador',
     'deputado-estadual',
+    'deputado-federal',
   ]);
+  assert.deepEqual(
+    data.candidates
+      .filter((candidate) => candidate.officeId === 'deputado-federal')
+      .map((candidate) => candidate.name),
+    ['Wellington Roberto', 'Wilson Santiago', 'Aguinaldo Ribeiro'],
+  );
   assert.equal(data.municipalities.find((item) => item.name === 'Monteiro').sections, 98);
   assert.equal(new Set(data.sections.map((section) => `${section.municipality}|${section.location}`)).size, 40);
   assert.equal(data.sections.filter((section) => section.status === 'Apurada').length, 0);
@@ -26,7 +33,7 @@ test('interpreta a estrutura eleitoral da planilha fornecida', () => {
 test('exporta um lançamento e permite reler a cópia', () => {
   const data = parseElectionWorkbook(fixture);
   const section = data.sections[0];
-  const candidate = data.candidates[0];
+  const candidate = data.candidates.find((item) => item.officeId === 'deputado-federal');
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cariri-apuracao-'));
   const output = path.join(tempDir, 'copia.xlsx');
 
