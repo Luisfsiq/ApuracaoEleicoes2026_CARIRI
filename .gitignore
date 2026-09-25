@@ -3,3 +3,4 @@ node_modules/
 .packaged-data/
 *.png
 dist/win-unpacked/
+dist/*.exe

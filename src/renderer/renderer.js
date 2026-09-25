@@ -8,6 +8,7 @@ const state = {
   storageKey: '',
   sectionPage: 0,
   sectionPageSize: 12,
+  selectedOffice: 'presidente',
   toastTimer: null,
 };
 
@@ -179,6 +180,76 @@ function renderMunicipalities() {
   }).join('');
 }
 
+function renderCandidateMunicipalities() {
+  if (!state.data.offices.some((office) => office.id === state.selectedOffice)) {
+    state.selectedOffice = state.data.offices[0]?.id;
+  }
+
+  $('#officeTabs').innerHTML = state.data.offices.map((office) => `
+    <button class="office-tab ${office.id === state.selectedOffice ? 'active' : ''}" type="button" role="tab" aria-selected="${office.id === state.selectedOffice}" data-office-id="${escapeHtml(office.id)}">
+      ${escapeHtml(office.label)}
+    </button>
+  `).join('');
+
+  const race = raceTotals().find((office) => office.id === state.selectedOffice);
+  if (!race) return;
+  const maxCandidateVotes = Math.max(...race.candidates.map((candidate) => candidate.votes));
+  const leaders = race.total ? race.candidates.filter((candidate) => candidate.votes === maxCandidateVotes) : [];
+  const municipalitiesWithVotes = state.data.municipalities.filter((municipality) => {
+    const municipalSections = state.sections.filter((section) => section.municipality === municipality.name);
+    return race.candidates.some((candidate) => municipalSections.some((section) => Number(section.votes[candidate.id]) > 0));
+  }).length;
+
+  $('#selectedOfficeTotal').textContent = formatNumber.format(race.total);
+  $('#selectedOfficeLabel').textContent = race.label;
+  $('#selectedOfficeLeader').textContent = !leaders.length
+    ? '—'
+    : leaders.length > 1
+      ? 'Empate'
+      : leaders[0].name;
+  $('#selectedOfficeLeaderMeta').textContent = !leaders.length
+    ? 'Aguardando votos'
+    : leaders.length > 1
+      ? `${formatNumber.format(maxCandidateVotes)} votos para cada líder`
+      : `${formatNumber.format(maxCandidateVotes)} votos informados`;
+  $('#municipalitiesWithVotes').textContent = `${municipalitiesWithVotes} de ${state.data.municipalities.length}`;
+  $('#candidateBreakdownTitle').textContent = `${race.label} por município`;
+  $('#municipalVotesEmpty').hidden = race.total > 0;
+
+  $('#candidateMunicipalityGrid').innerHTML = race.candidates.map((candidate) => {
+    const municipalityVotes = state.data.municipalities.map((municipality) => {
+      const votes = state.sections
+        .filter((section) => section.municipality === municipality.name)
+        .reduce((sum, section) => sum + (Number(section.votes[candidate.id]) || 0), 0);
+      return { ...municipality, votes };
+    });
+    const maxMunicipalVotes = Math.max(...municipalityVotes.map((municipality) => municipality.votes));
+    const share = race.total ? candidate.votes / race.total : 0;
+
+    return `<article class="candidate-municipality-card">
+      <header>
+        <div>
+          <span class="candidate-party">${escapeHtml(candidate.party || 'Partido não informado')}</span>
+          <h3>${escapeHtml(candidate.name)}</h3>
+        </div>
+        <div class="candidate-regional-total">
+          <strong>${formatNumber.format(candidate.votes)}</strong>
+          <span>${(share * 100).toFixed(1).replace('.', ',')}% no cargo</span>
+        </div>
+      </header>
+      <div class="municipal-vote-list">
+        ${municipalityVotes.map((municipality) => {
+          const width = maxMunicipalVotes ? (municipality.votes / maxMunicipalVotes) * 100 : 0;
+          return `<div class="municipal-vote-row ${municipality.votes > 0 && municipality.votes === maxMunicipalVotes ? 'highest' : ''}">
+            <div class="municipal-vote-label"><span>${escapeHtml(municipality.name)}</span><strong>${formatNumber.format(municipality.votes)}</strong></div>
+            <div class="municipal-vote-track"><i style="width:${width}%"></i></div>
+          </div>`;
+        }).join('')}
+      </div>
+    </article>`;
+  }).join('');
+}
+
 function filteredSections() {
   const query = normalizeSearch($('#sectionSearch').value);
   const municipality = $('#sectionMunicipalityFilter').value;
@@ -312,6 +383,7 @@ function clearEntry() {
 function renderAll() {
   renderDashboard();
   renderMunicipalities();
+  renderCandidateMunicipalities();
   renderSections();
 }
 
@@ -384,6 +456,12 @@ function bindEvents() {
 
     const editButton = event.target.closest('[data-edit-section]');
     if (editButton) openEntry(editButton.dataset.editSection);
+
+    const officeButton = event.target.closest('[data-office-id]');
+    if (officeButton) {
+      state.selectedOffice = officeButton.dataset.officeId;
+      renderCandidateMunicipalities();
+    }
   });
   $('#importButton').addEventListener('click', importWorkbook);
   $('#exportButton').addEventListener('click', exportWorkbook);

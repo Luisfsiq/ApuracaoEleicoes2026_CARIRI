@@ -32,6 +32,10 @@
             <span class="nav-icon" aria-hidden="true">◎</span>
             Municípios
           </button>
+          <button class="nav-item" data-page="candidateMunicipalities">
+            <span class="nav-icon" aria-hidden="true">≡</span>
+            Votos por município
+          </button>
           <button class="nav-item" data-page="sections">
             <span class="nav-icon" aria-hidden="true">☷</span>
             Seções
@@ -160,6 +164,60 @@
           <div id="municipalityCards" class="municipality-grid"></div>
         </section>
 
+        <section id="candidateMunicipalitiesPage" class="page" data-page-content="candidateMunicipalities">
+          <div class="page-heading candidate-municipality-heading">
+            <div>
+              <span class="eyebrow">DISTRIBUIÇÃO DOS VOTOS</span>
+              <h1>Votos por candidato e município</h1>
+              <p>Compare quantos votos cada candidato recebeu em cada um dos nove municípios da planilha.</p>
+            </div>
+          </div>
+
+          <div class="office-filter panel">
+            <div>
+              <span class="filter-caption">SELECIONE O CARGO</span>
+              <div id="officeTabs" class="office-tabs" role="tablist" aria-label="Cargo eleitoral"></div>
+            </div>
+            <p>Os totais consideram todos os votos preenchidos, inclusive em seções ainda marcadas como pendentes.</p>
+          </div>
+
+          <div id="municipalVotesEmpty" class="notice-card municipal-votes-notice" hidden>
+            <div class="notice-icon">i</div>
+            <div>
+              <strong>Aguardando os primeiros votos deste cargo</strong>
+              <p>Os valores municipais serão atualizados automaticamente depois de um lançamento.</p>
+            </div>
+            <button class="text-button" data-go="entry">Lançar votos</button>
+          </div>
+
+          <div class="municipal-vote-stats">
+            <article class="municipal-vote-stat">
+              <span>Total informado no cargo</span>
+              <strong id="selectedOfficeTotal">0</strong>
+              <small id="selectedOfficeLabel">Presidente</small>
+            </article>
+            <article class="municipal-vote-stat">
+              <span>Liderança regional</span>
+              <strong id="selectedOfficeLeader">—</strong>
+              <small id="selectedOfficeLeaderMeta">Aguardando votos</small>
+            </article>
+            <article class="municipal-vote-stat">
+              <span>Municípios com votos</span>
+              <strong id="municipalitiesWithVotes">0 de 9</strong>
+              <small>neste cargo</small>
+            </article>
+          </div>
+
+          <div class="section-heading candidate-breakdown-heading">
+            <div>
+              <span class="eyebrow">COMPARATIVO MUNICIPAL</span>
+              <h2 id="candidateBreakdownTitle">Presidente por município</h2>
+            </div>
+            <p>A barra compara os municípios do mesmo candidato. O número ao lado é a quantidade exata de votos.</p>
+          </div>
+          <div id="candidateMunicipalityGrid" class="candidate-municipality-grid"></div>
+        </section>
+
         <section id="sectionsPage" class="page" data-page-content="sections">
           <div class="page-heading">
             <div>
@@ -278,7 +336,7 @@
           <div class="guide-grid">
             <article class="guide-step"><span>01</span><h2>Importe</h2><p>Use a planilha fornecida ou escolha outra cópia no mesmo formato. O aplicativo identifica as abas municipais automaticamente.</p></article>
             <article class="guide-step"><span>02</span><h2>Registre</h2><p>Em <b>Lançamento</b>, selecione município, local e seção. Digite os votos de cada candidato e altere o status para apurada.</p></article>
-            <article class="guide-step"><span>03</span><h2>Confira</h2><p>A <b>Visão geral</b> recalcula o progresso e os rankings. A tela de <b>Seções</b> ajuda a encontrar pendências.</p></article>
+            <article class="guide-step"><span>03</span><h2>Compare</h2><p>A <b>Visão geral</b> recalcula os rankings. Em <b>Votos por município</b>, cada candidato aparece com os totais dos nove municípios.</p></article>
             <article class="guide-step"><span>04</span><h2>Exporte</h2><p>Gere uma nova planilha Excel com os lançamentos. O arquivo de origem permanece intacto.</p></article>
           </div>
           <div class="definitions panel">
