@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';" />
+    <title>Apuração Cariri Ocidental</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="loadingScreen" class="loading-screen">
+      <div class="loading-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+      <p>Preparando a apuração</p>
+    </div>
+
+    <div id="app" class="app-shell" hidden>
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div>
+            <strong>Cariri</strong>
+            <small>Apuração regional</small>
+          </div>
+        </div>
+
+        <nav class="main-nav" aria-label="Navegação principal">
+          <button class="nav-item active" data-page="dashboard">
+            <span class="nav-icon" aria-hidden="true">▦</span>
+            Visão geral
+          </button>
+          <button class="nav-item" data-page="municipalities">
+            <span class="nav-icon" aria-hidden="true">◎</span>
+            Municípios
+          </button>
+          <button class="nav-item" data-page="sections">
+            <span class="nav-icon" aria-hidden="true">☷</span>
+            Seções
+          </button>
+          <button class="nav-item" data-page="entry">
+            <span class="nav-icon" aria-hidden="true">+</span>
+            Lançamento
+          </button>
+          <button class="nav-item" data-page="guide">
+            <span class="nav-icon" aria-hidden="true">?</span>
+            Como usar
+          </button>
+        </nav>
+
+        <div class="sidebar-foot">
+          <div class="zone-summary">
+            <span>Zonas eleitorais</span>
+            <strong>29ª <i></i> 43ª</strong>
+          </div>
+          <p>Dados salvos neste computador até a exportação.</p>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div class="source-status">
+            <span class="status-dot"></span>
+            <div>
+              <small>Fonte ativa</small>
+              <strong id="sourceName">apuracaocaririocidental.xlsx</strong>
+            </div>
+          </div>
+          <div class="topbar-actions">
+            <button id="importButton" class="button secondary">Importar planilha</button>
+            <button id="exportButton" class="button primary">Exportar cópia Excel</button>
+          </div>
+        </header>
+
+        <section id="dashboardPage" class="page active" data-page-content="dashboard">
+          <div class="page-heading dashboard-heading">
+            <div>
+              <span class="eyebrow">ELEIÇÕES 2026</span>
+              <h1>Apuração do Cariri Ocidental</h1>
+              <p>Acompanhe o avanço das seções e os votos informados nos nove municípios da planilha.</p>
+            </div>
+            <div class="updated-at">
+              <small>Planilha atualizada em</small>
+              <strong id="sourceDate">—</strong>
+            </div>
+          </div>
+
+          <div id="emptyNotice" class="notice-card" hidden>
+            <div class="notice-icon">i</div>
+            <div>
+              <strong>A apuração ainda não começou</strong>
+              <p>A planilha recebida tem todas as seções como pendentes. Use <b>Lançamento</b> para registrar os primeiros boletins.</p>
+            </div>
+            <button class="text-button" data-go="entry">Lançar votos</button>
+          </div>
+
+          <div class="overview-grid">
+            <article class="progress-panel panel">
+              <div class="panel-kicker">PROGRESSO REGIONAL</div>
+              <div class="progress-content">
+                <div id="progressRing" class="progress-ring" style="--progress: 0deg">
+                  <div>
+                    <strong id="progressPercent">0%</strong>
+                    <span>apurado</span>
+                  </div>
+                </div>
+                <div class="progress-copy">
+                  <strong><span id="countedSections">0</span> de <span id="totalSections">245</span></strong>
+                  <span>seções contabilizadas</span>
+                  <div class="mini-rule"></div>
+                  <p><span id="pendingSections">245</span> seções aguardam boletim.</p>
+                </div>
+              </div>
+            </article>
+
+            <div class="stat-grid">
+              <article class="stat-card">
+                <span>Municípios</span>
+                <strong id="municipalityCount">9</strong>
+                <small>na região</small>
+              </article>
+              <article class="stat-card">
+                <span>Locais de votação</span>
+                <strong id="locationCount">40</strong>
+                <small>cadastrados</small>
+              </article>
+              <article class="stat-card wide">
+                <span>Município mais avançado</span>
+                <strong id="leadingMunicipality">—</strong>
+                <small id="leadingMunicipalityMeta">Nenhuma seção apurada</small>
+              </article>
+            </div>
+          </div>
+
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">VOTOS POR CARGO</span>
+              <h2>Panorama das disputas</h2>
+            </div>
+            <p>Percentuais calculados somente entre os candidatos listados na planilha.</p>
+          </div>
+          <div id="raceCards" class="race-grid"></div>
+
+          <div class="section-heading compact">
+            <div>
+              <span class="eyebrow">TERRITÓRIO</span>
+              <h2>Avanço por município</h2>
+            </div>
+            <button class="text-button" data-go="municipalities">Ver detalhes</button>
+          </div>
+          <div id="municipalityProgress" class="municipality-strip"></div>
+        </section>
+
+        <section id="municipalitiesPage" class="page" data-page-content="municipalities">
+          <div class="page-heading">
+            <div>
+              <span class="eyebrow">RECORTE MUNICIPAL</span>
+              <h1>Municípios</h1>
+              <p>Compare o andamento da apuração e consulte os totais de cada disputa.</p>
+            </div>
+          </div>
+          <div id="municipalityCards" class="municipality-grid"></div>
+        </section>
+
+        <section id="sectionsPage" class="page" data-page-content="sections">
+          <div class="page-heading">
+            <div>
+              <span class="eyebrow">CONTROLE OPERACIONAL</span>
+              <h1>Seções eleitorais</h1>
+              <p>Localize boletins por município, local, zona, seção ou situação.</p>
+            </div>
+          </div>
+          <div class="filter-bar panel">
+            <label class="search-field">
+              <span>Buscar</span>
+              <input id="sectionSearch" type="search" placeholder="Município, local ou seção" />
+            </label>
+            <label>
+              <span>Município</span>
+              <select id="sectionMunicipalityFilter"></select>
+            </label>
+            <label>
+              <span>Status</span>
+              <select id="sectionStatusFilter">
+                <option value="">Todos</option>
+                <option value="Pendente">Pendentes</option>
+                <option value="Apurada">Apuradas</option>
+              </select>
+            </label>
+            <div class="result-counter"><strong id="sectionResultCount">0</strong><span>resultados</span></div>
+          </div>
+          <div class="table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th>Município</th>
+                  <th>Zona</th>
+                  <th>Local de votação</th>
+                  <th>Seção</th>
+                  <th>Status</th>
+                  <th>Votos lançados</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="sectionsTableBody"></tbody>
+            </table>
+            <div id="sectionsEmpty" class="table-empty" hidden>Nenhuma seção corresponde aos filtros.</div>
+            <div class="table-footer">
+              <span id="paginationInfo"></span>
+              <div>
+                <button id="previousPage" class="icon-button" aria-label="Página anterior">←</button>
+                <button id="nextPage" class="icon-button" aria-label="Próxima página">→</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="entryPage" class="page" data-page-content="entry">
+          <div class="page-heading">
+            <div>
+              <span class="eyebrow">REGISTRO DE BOLETIM</span>
+              <h1>Lançamento por seção</h1>
+              <p>Escolha uma seção, informe os votos e confirme a situação do boletim.</p>
+            </div>
+          </div>
+
+          <div class="entry-layout">
+            <aside class="entry-selector panel">
+              <div class="step-label"><b>1</b><span>Selecione a seção</span></div>
+              <label>
+                <span>Município</span>
+                <select id="entryMunicipality"></select>
+              </label>
+              <label>
+                <span>Local de votação</span>
+                <select id="entryLocation"></select>
+              </label>
+              <label>
+                <span>Seção</span>
+                <select id="entrySection"></select>
+              </label>
+              <div id="selectedSectionMeta" class="selected-meta"></div>
+            </aside>
+
+            <form id="entryForm" class="entry-form panel">
+              <div class="entry-form-head">
+                <div class="step-label"><b>2</b><span>Informe o boletim</span></div>
+                <label class="status-control">
+                  <span>Situação</span>
+                  <select id="entryStatus">
+                    <option value="Pendente">Pendente</option>
+                    <option value="Apurada">Apurada</option>
+                  </select>
+                </label>
+              </div>
+              <div id="candidateInputs" class="candidate-groups"></div>
+              <div class="entry-summary">
+                <div>
+                  <small>Total informado nos quatro cargos</small>
+                  <strong id="entryTotal">0</strong>
+                </div>
+                <p>Este total soma votos de cargos diferentes e não representa o número de eleitores.</p>
+              </div>
+              <div class="form-actions">
+                <button type="button" id="clearEntryButton" class="button ghost">Limpar campos</button>
+                <button type="submit" class="button primary">Salvar lançamento</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section id="guidePage" class="page" data-page-content="guide">
+          <div class="page-heading">
+            <div>
+              <span class="eyebrow">GUIA RÁPIDO</span>
+              <h1>Como usar</h1>
+              <p>Um fluxo simples para importar, registrar, conferir e compartilhar a apuração.</p>
+            </div>
+          </div>
+          <div class="guide-grid">
+            <article class="guide-step"><span>01</span><h2>Importe</h2><p>Use a planilha fornecida ou escolha outra cópia no mesmo formato. O aplicativo identifica as abas municipais automaticamente.</p></article>
+            <article class="guide-step"><span>02</span><h2>Registre</h2><p>Em <b>Lançamento</b>, selecione município, local e seção. Digite os votos de cada candidato e altere o status para apurada.</p></article>
+            <article class="guide-step"><span>03</span><h2>Confira</h2><p>A <b>Visão geral</b> recalcula o progresso e os rankings. A tela de <b>Seções</b> ajuda a encontrar pendências.</p></article>
+            <article class="guide-step"><span>04</span><h2>Exporte</h2><p>Gere uma nova planilha Excel com os lançamentos. O arquivo de origem permanece intacto.</p></article>
+          </div>
+          <div class="definitions panel">
+            <h2>O que cada indicador significa</h2>
+            <dl>
+              <div><dt>% apurado</dt><dd>Seções marcadas como “Apurada” divididas pelo total de seções.</dd></div>
+              <div><dt>Percentual do candidato</dt><dd>Participação nos votos dos candidatos listados para o mesmo cargo.</dd></div>
+              <div><dt>Eleitores do local</dt><dd>Referência do local de votação inteiro. Não corresponde ao eleitorado de uma seção isolada.</dd></div>
+              <div><dt>Votos lançados</dt><dd>Soma dos campos de candidatos da seção, abrangendo os quatro cargos.</dd></div>
+            </dl>
+          </div>
+          <div class="integrity-note">
+            <strong>Boas práticas</strong>
+            <p>Confira o boletim antes de marcar a seção como apurada. Exporte cópias periódicas durante a apuração para manter um histórico.</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="renderer.js"></script>
+  </body>
+</html>

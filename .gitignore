@@ -1,0 +1,5 @@
+node_modules/
+.electron-data*/
+.packaged-data/
+*.png
+dist/win-unpacked/
